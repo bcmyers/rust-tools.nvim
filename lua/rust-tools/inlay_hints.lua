@@ -199,19 +199,19 @@ local function render_line(line, line_hints, bufnr)
   end
 
   -- show other hints with commas and a thicc arrow
-  if not vim.tbl_isempty(other_hints) then
-    virt_text = virt_text .. opts.other_hints_prefix
-    for i, o_hint in pairs(other_hints) do
-      if string.sub(o_hint.label, 1, 2) == ": " then
-        virt_text = virt_text .. o_hint.label:sub(3)
-      else
-        virt_text = virt_text .. o_hint.label
-      end
-      if i ~= #other_hints then
-        virt_text = virt_text .. ", "
-      end
-    end
-  end
+  -- if not vim.tbl_isempty(other_hints) then
+  --   virt_text = virt_text .. opts.other_hints_prefix
+  --   for i, o_hint in pairs(other_hints) do
+  --     if string.sub(o_hint.label, 1, 2) == ": " then
+  --       virt_text = virt_text .. o_hint.label:sub(3)
+  --     else
+  --       virt_text = virt_text .. o_hint.label
+  --     end
+  --     if i ~= #other_hints then
+  --       virt_text = virt_text .. ", "
+  --     end
+  --   end
+  -- end
 
   -- set the virtual text if it is not empty
   if virt_text ~= "" then
