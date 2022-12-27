@@ -4,7 +4,7 @@ local M = {}
 
 function M.new()
   M.namespace = vim.api.nvim_create_namespace("textDocument/inlayHints")
-  local self = setmetatable({ cache = {}, enabled = false }, { __index = M })
+  local self = setmetatable({cache = {}, enabled = false}, {__index = M})
 
   return self
 end
@@ -51,28 +51,26 @@ end
 
 function M.enable_cache_autocmd()
   local opts = rt.config.options.tools.inlay_hints
-  vim.cmd(string.format(
-    [[
+  vim.cmd(
+    string.format(
+      [[
         augroup InlayHintsCache
         autocmd BufWritePost,BufReadPost,BufEnter,BufWinEnter,TabEnter,TextChanged,TextChangedI *.rs :lua require"rust-tools".inlay_hints.cache()
         %s
         augroup END
     ]],
-    opts.only_current_line
-        and "autocmd CursorMoved,CursorMovedI *.rs :lua require'rust-tools'.inlay_hints.render()"
-      or ""
-  ))
+      opts.only_current_line and "autocmd CursorMoved,CursorMovedI *.rs :lua require'rust-tools'.inlay_hints.render()" or
+        ""
+    )
+  )
 end
 
 function M.disable_cache_autocmd()
-  vim.cmd(
-    [[
+  vim.cmd([[
     augroup InlayHintsCache
     autocmd!
     augroup END
-  ]],
-    false
-  )
+  ]], false)
 end
 
 local function get_params(client, bufnr)
@@ -81,30 +79,21 @@ local function get_params(client, bufnr)
     range = {
       start = {
         line = 0,
-        character = 0,
+        character = 0
       },
       ["end"] = {
         line = 0,
-        character = 0,
-      },
-    },
+        character = 0
+      }
+    }
   }
 
   local line_count = vim.api.nvim_buf_line_count(bufnr) - 1
-  local last_line = vim.api.nvim_buf_get_lines(
-    bufnr,
-    line_count,
-    line_count + 1,
-    true
-  )
+  local last_line = vim.api.nvim_buf_get_lines(bufnr, line_count, line_count + 1, true)
 
   params["range"]["end"]["line"] = line_count
-  params["range"]["end"]["character"] = vim.lsp.util.character_offset(
-    bufnr,
-    line_count,
-    #last_line[1],
-    client.offset_encoding
-  )
+  params["range"]["end"]["character"] =
+    vim.lsp.util.character_offset(bufnr, line_count, #last_line[1], client.offset_encoding)
 
   return params
 end
@@ -136,9 +125,9 @@ local function parse_hints(result)
 
     local function add_line()
       if map[line] ~= nil then
-        table.insert(map[line], { label = label, kind = kind, range = range })
+        table.insert(map[line], {label = label, kind = kind, range = range})
       else
-        map[line] = { { label = label, kind = kind, range = range } }
+        map[line] = {{label = label, kind = kind, range = range}}
       end
     end
 
@@ -150,7 +139,7 @@ end
 function M.cache_render(self, bufnr)
   local buffer = bufnr or vim.api.nvim_get_current_buf()
 
-  for _, v in ipairs(vim.lsp.buf_get_clients(buffer)) do
+  for _, v in pairs(vim.lsp.buf_get_clients(buffer)) do
     if rt.utils.is_ra_server(v) then
       v.request(
         "textDocument/inlayHint",
@@ -227,13 +216,19 @@ local function render_line(line, line_hints, bufnr)
   -- set the virtual text if it is not empty
   if virt_text ~= "" then
     ---@diagnostic disable-next-line: param-type-mismatch
-    vim.api.nvim_buf_set_extmark(bufnr, M.namespace, line, 0, {
-      virt_text_pos = opts.right_align and "right_align" or "eol",
-      virt_text = {
-        { virt_text, opts.highlight },
-      },
-      hl_mode = "combine",
-    })
+    vim.api.nvim_buf_set_extmark(
+      bufnr,
+      M.namespace,
+      line,
+      0,
+      {
+        virt_text_pos = opts.right_align and "right_align" or "eol",
+        virt_text = {
+          {virt_text, opts.highlight}
+        },
+        hl_mode = "combine"
+      }
+    )
   end
 end
 
